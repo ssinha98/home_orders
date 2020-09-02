@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "924052428783",
+    "firebase_url": "https://home-tracker-92ea0.firebaseio.com",
+    "project_id": "home-tracker-92ea0",
+    "storage_bucket": "home-tracker-92ea0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924052428783:android:b7bab3ea56d57a53b1c81a",
+        "android_client_info": {
+          "package_name": "com.sahil.hellow_world"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924052428783-2071g85693ed1evffrje5ltoo60g6kqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-FYiLnuvkCLdMNyinpAn7v7rTMhli960"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "924052428783-2071g85693ed1evffrje5ltoo60g6kqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
