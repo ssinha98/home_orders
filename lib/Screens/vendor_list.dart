@@ -5,6 +5,8 @@ class VendorList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.pink,
+      width: double.infinity,
+      child: Text("Filter by Vendor"),
     );
   }
 }

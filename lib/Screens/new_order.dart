@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hellow_world/Models/orders.dart';
 import 'package:hellow_world/Services/add_order_firestore.dart';
+import 'package:hellow_world/Services/orders_crud.dart';
 import 'package:hellow_world/Services/vendor_crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hellow_world/Services/authenticate.dart';
@@ -23,7 +25,8 @@ class _AddOrderFormState extends State<AddOrderForm> {
   final List<String> vendorsDefault = ["Amazon", "Flipkart", "Swiggy"];
 
   VendorCRUD vendorCrud = new VendorCRUD();
-  QuerySnapshot vendorsFirebase;
+  OrderCRUD orderCrud = new OrderCRUD();
+  Stream vendorsFirebase;
 
   final List<String> paymentMethods = ["Card", "Cash", "Vendor Credit"];
 
@@ -35,12 +38,13 @@ class _AddOrderFormState extends State<AddOrderForm> {
   bool dismissed;
   bool processing;
   String uid;
+  Stream vendors;
 
   // Form values
   void initState() {
     vendorCrud.getVendors().then((results) {
       setState(() {
-        vendorsFirebase = results.toList();
+        vendors = results;
       });
     });
     super.initState();
@@ -53,10 +57,6 @@ class _AddOrderFormState extends State<AddOrderForm> {
 
   @override
   Widget build(BuildContext context) {
-    void getUid() async {
-      uid = auth.getUID().toString();
-    }
-
     return SingleChildScrollView(
       child: Container(
           padding: EdgeInsets.all(10),
@@ -88,25 +88,21 @@ class _AddOrderFormState extends State<AddOrderForm> {
                 ),
                 SizedBox(height: 10),
                 StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection('userData')
-                        .document(uid)
-                        .collection('vendors')
-                        .snapshots(),
+                    stream: vendors,
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) return new Text("Please wait");
+                      if (!snapshot.hasData) 
+                        return new Text("Please wait");
                       return DropdownButtonFormField(
                         items: snapshot.data.documents
                             .map((DocumentSnapshot document) {
                           return DropdownMenuItem(
-                              value: document.data["vendorName"],
-                              child: new Text(document.data["vendorName"]));
+                              value: document.data['vendorName'],
+                              child: new Text(document.data['vendorName']));
                         }).toList(),
                         onChanged: (val) =>
                             setState(() => _vendorSelected = val),
                       );
                     }),
-                // Container(height: 50, color: Colors.grey),
                 SizedBox(
                   height: 10,
                 ),
@@ -193,27 +189,20 @@ class _AddOrderFormState extends State<AddOrderForm> {
                               style: TextStyle(color: Colors.white),
                             ),
                             onPressed: () async {
-                              print(uid);
                               setState(() {
                                 processing = true;
                               });
-                              // This uses the helper function to save new orders to Firebase.
-                              if (widget.note != null) {
-                                await orderDBS.updateData(widget.note.id, {
-                                  'title': _orderTitle.text,
-                                  'vendor': _vendorSelected,
-                                  'amount': _orderAmount,
-                                  'method': _paymentMethod,
-                                  'order_date': widget.note.orderDate
-                                });
-                              } else {
-                                await orderDBS.createItem(OrderModel(
-                                    title: _orderTitle.text,
-                                    amount: _orderAmount,
-                                    method: _paymentMethod,
-                                    orderDate: _orderDate,
-                                    vendor: _vendorSelected));
-                              }
+                              orderCrud.addData({
+                                'title': _orderTitle.text,
+                                'vendor': _vendorSelected,
+                                'amount': _orderAmount,
+                                'method': _paymentMethod,
+                                'order_date': _orderDate
+                              }).then((result) {
+                                print("Saved");
+                              }).catchError((e) {
+                                print(e);
+                              });
                               Navigator.pop(context);
                               setState(() {
                                 processing = false;

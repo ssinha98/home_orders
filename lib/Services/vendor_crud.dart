@@ -42,11 +42,11 @@ class VendorCRUD {
 
   getVendors() async {
     final uid = await auth.getUID();
-    await Firestore.instance
+    return Firestore.instance
         .collection('userData')
         .document(uid)
         .collection('vendors')
-        .getDocuments();
+        .snapshots();
   }
 
   updateData(selectedDoc, newValues) async {

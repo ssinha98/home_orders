@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hellow_world/Screens/calendar.dart';
 import 'package:hellow_world/Screens/dashboard.dart';
 import 'package:hellow_world/Screens/new_order.dart';
+import 'package:hellow_world/Screens/orders_by_date.dart';
 import 'package:hellow_world/Screens/vendor_list.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
@@ -12,7 +13,7 @@ class Bottombarnav extends StatefulWidget {
 
 class _BottombarnavState extends State<Bottombarnav> {
   var _currentIndex = 0;
-  final List<Widget> _children = [Dashboard(), Calendar(), VendorList()];
+  final List<Widget> _children = [Dashboard(), OrderByDate(), VendorList()];
 
   void onTabTapped(int index) {
     setState(() {
@@ -23,6 +24,7 @@ class _BottombarnavState extends State<Bottombarnav> {
   final iconList = <IconData>[
     Icons.home,
     Icons.calendar_today,
+    // Icons.person
   ];
 
   void _showOrderForm() {

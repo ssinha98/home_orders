@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hellow_world/Models/orders.dart';
 import 'package:hellow_world/Models/user.dart';
 import 'package:hellow_world/Screens/new_vendor.dart';
-import 'package:hellow_world/Screens/order_page.dart';
 import 'package:hellow_world/Services/add_order_firestore.dart';
 import 'package:hellow_world/Services/authenticate.dart';
 import 'package:hellow_world/Services/vendor_crud.dart';
@@ -24,6 +23,7 @@ class _DashboardState extends State<Dashboard> {
   Map<DateTime, List<dynamic>> _orders;
   List<dynamic> _selectedOrders;
   Stream vendors;
+  Stream todays_orders;
 
   VendorCRUD vendorCrud = new VendorCRUD();
   OrderCRUD orderCRUD = new OrderCRUD();
@@ -87,6 +87,11 @@ class _DashboardState extends State<Dashboard> {
         vendors = results;
       });
     });
+    orderCRUD.getTodaysOrders().then((results) {
+      setState(() {
+        todays_orders = results;
+      });
+    });
     super.initState();
     _controller = CalendarController();
     _orders = {};
@@ -124,13 +129,6 @@ class _DashboardState extends State<Dashboard> {
         leading: Container(),
         actions: <Widget>[
           MaterialButton(
-              child: Text("TEST"),
-              color: Colors.pink,
-              onPressed: () async {
-                orderCRUD.countTodaysOrders();
-                print(await _auth.getUID());
-              }),
-          MaterialButton(
               child: Text(
                 "Sign out",
                 style: TextStyle(color: Colors.white),
@@ -160,126 +158,17 @@ class _DashboardState extends State<Dashboard> {
                   child: Column(
                     children: <Widget>[
                       Container(
-                          child: Text("What's coming up",
+                          child: Text("What's coming up today",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 20))),
-                      TableCalendar(
-                        events: _orders,
-                        initialCalendarFormat: CalendarFormat.twoWeeks,
-                        calendarStyle: CalendarStyle(
-                            weekendStyle:
-                                TextStyle().copyWith(color: Colors.blue[800]),
-                            canEventMarkersOverflow: true,
-                            todayColor: Colors.black,
-                            selectedColor: Colors.blueAccent,
-                            todayStyle: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                                color: Colors.white)),
-                        daysOfWeekStyle: DaysOfWeekStyle(
-                          weekendStyle:
-                              TextStyle().copyWith(color: Colors.grey[600]),
-                        ),
-                        headerStyle: HeaderStyle(
-                          centerHeaderTitle: true,
-                          formatButtonDecoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          formatButtonTextStyle: TextStyle(color: Colors.white),
-                          formatButtonShowsNext: false,
-                        ),
-                        startingDayOfWeek: StartingDayOfWeek.monday,
-                        onDaySelected: (date, events) {
-                          setState(() {
-                            _selectedOrders = events;
-                          });
-                        },
-                        builders: CalendarBuilders(
-                          selectedDayBuilder: (context, date, events) =>
-                              Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Text(
-                                    date.day.toString(),
-                                    style: TextStyle(color: Colors.white),
-                                  )),
-                          todayDayBuilder: (context, date, events) => Container(
-                              margin: const EdgeInsets.all(4.0),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              child: Text(
-                                date.day.toString(),
-                                style: TextStyle(color: Colors.white),
-                              )),
-                        ),
-                        calendarController: _controller,
+                      SizedBox(
+                        height: 10,
                       ),
-                      SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.all(5),
-                        height: 120,
-                        color: Colors.grey[100],
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: <Widget>[
-                            ..._selectedOrders.map((order) => Container(
-                                  width: 300,
-                                  height: 100,
-                                  child: Card(
-                                    color: Colors.black87,
-                                    elevation: 5,
-                                    child: Center(
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                            backgroundColor: Colors.transparent,
-                                            child: order.method == "Card"
-                                                ? CardIcon()
-                                                : order.method == "Cash"
-                                                    ? CashIcon()
-                                                    : order.method ==
-                                                            "Vendor Credit"
-                                                        ? VendorCreditIcon()
-                                                        : CashIcon()),
-                                        title: Text(
-                                          order.title,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle: Text(
-                                          order.vendor,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        trailing: Text(
-                                          '₹${order.amount.toString()}',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) => OrderPage(
-                                                        order: order,
-                                                      )));
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ))
-                          ],
-                        ),
-                      ),
+                          padding: EdgeInsets.all(5),
+                          height: 120,
+                          color: Colors.grey[100],
+                          child: _todaysOrderList()),
                       SizedBox(
                         height: 10,
                       ),
@@ -321,6 +210,72 @@ class _DashboardState extends State<Dashboard> {
             );
           }),
     );
+  }
+
+  Widget _todaysOrderList() {
+    if (todays_orders != null) {
+      return StreamBuilder(
+          stream: todays_orders,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: snapshot.data.documents.length,
+                  itemBuilder: (context, i) {
+                    return new Container(
+                        width: 300,
+                        height: 100,
+                        child: Card(
+                            color: Colors.black87,
+                            child: ListTile(
+                              onTap: () {
+                                print("edit order");
+                              },
+                              leading: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: snapshot.data.documents[i]
+                                              .data['method'] ==
+                                          "Card"
+                                      ? CardIcon()
+                                      : snapshot.data.documents[i]
+                                                  .data['method'] ==
+                                              "Cash"
+                                          ? CashIcon()
+                                          : snapshot.data.documents[i]
+                                                      .data['method'] ==
+                                                  "Vendor Credit"
+                                              ? VendorCreditIcon()
+                                              : CashIcon()),
+                              title: Text(
+                                snapshot.data.documents[i].data['title'],
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                snapshot.data.documents[i].data['vendor'],
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: Text(
+                                '₹${snapshot.data.documents[i].data['amount'].toString()}',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )
+                            ));
+                  });
+            } else {
+              return Container(
+                child: Text("No Orders Today!"),
+              );
+            }
+          });
+    } else {
+      return Container(child: Text("No Orders Found for Today!"));
+    }
   }
 
   Widget _vendorList() {
@@ -365,7 +320,8 @@ class _DashboardState extends State<Dashboard> {
                     );
                   });
             } else {
-              return CircularProgressIndicator();
+              return Text(
+                  "No Vendors Yet - Add someone you buy from to get started!");
             }
           });
     } else {
