@@ -33,6 +33,7 @@ dependencies:
   firebase_helpers: ^0.1.11
   intl: ^0.16.1
   animated_bottom_navigation_bar: ^0.1.2+2
+  url_launcher: ^5.7.5
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -59,7 +60,6 @@ flutter:
     - assets/multicoloured.jpg
     - assets/red.jpg
     - assets/Cash.png
-    - assets/Swiggy.jpg
     - assets/Card.png
     - assets/Vendor_credit.png
 

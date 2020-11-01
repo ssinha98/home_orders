@@ -81,7 +81,7 @@ class _AddOrderFormState extends State<AddOrderForm> {
                   decoration: InputDecoration(
                     icon: Icon(Icons.shopping_cart),
                     hintText: "What's coming in?'",
-                    labelText: 'Order Title',
+                    labelText: "What's coming in?",
                   ),
                   validator: (val) =>
                       val.isEmpty ? 'Please enter a name' : null,
@@ -90,9 +90,9 @@ class _AddOrderFormState extends State<AddOrderForm> {
                 StreamBuilder<QuerySnapshot>(
                     stream: vendors,
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) 
-                        return new Text("Please wait");
+                      if (!snapshot.hasData) return new Text("Please wait");
                       return DropdownButtonFormField(
+                        hint: Text("Who's delivering?"),
                         items: snapshot.data.documents
                             .map((DocumentSnapshot document) {
                           return DropdownMenuItem(
@@ -156,28 +156,34 @@ class _AddOrderFormState extends State<AddOrderForm> {
                   ),
                 ),
                 SizedBox(height: 10),
-                MaterialButton(
-                    child: Text(
-                      "Order Date",
-                      style: TextStyle(color: Colors.white),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      " Due on ",
+                      style: TextStyle(fontSize: 20, color: Colors.grey),
                     ),
-                    color: Colors.lightBlue,
-                    onPressed: () async {
-                      // Show date picker
-                      print("Show date picker");
-                      DateTime picked = await showDatePicker(
-                          context: context,
-                          initialDate: _orderDate,
-                          firstDate: DateTime(_orderDate.year - 5),
-                          lastDate: DateTime(_orderDate.year + 5));
-                      if (picked != null) {
-                        setState(() {
-                          _orderDate = picked;
-                        });
-                      }
-                    }),
+                    IconButton(
+                        icon: Icon(Icons.calendar_today),
+                        color: Colors.lightBlue,
+                        onPressed: () async {
+                          // Show date picker
+                          print("Show date picker");
+                          DateTime picked = await showDatePicker(
+                              context: context,
+                              initialDate: _orderDate,
+                              firstDate: DateTime(_orderDate.year - 5),
+                              lastDate: DateTime(_orderDate.year + 5));
+                          if (picked != null) {
+                            setState(() {
+                              _orderDate = picked;
+                            });
+                          }
+                        }),
+                  ],
+                ),
                 SizedBox(
-                  height: 10,
+                  height: 30,
                 ),
                 processing
                     ? Center(child: CircularProgressIndicator())

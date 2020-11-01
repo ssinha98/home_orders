@@ -457,7 +457,7 @@ class _ScratchCalendarState extends State<ScratchCalendar> {
                     );
                   });
             } else {
-              return Text("Nothing for today!");
+              return CircularProgressIndicator();
             }
           });
     } else {

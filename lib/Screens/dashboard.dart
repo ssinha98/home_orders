@@ -264,8 +264,7 @@ class _DashboardState extends State<Dashboard> {
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
-                            )
-                            ));
+                            )));
                   });
             } else {
               return Container(
@@ -385,9 +384,8 @@ class _DashboardState extends State<Dashboard> {
                     //   color: Colors.white,
                     //   size: 80,
                     //    )
-                    child: Image.asset(
-              "assets/Swiggy.jpg",
-            ))),
+
+                    )),
             // Column 2
             Expanded(
               child: Container(

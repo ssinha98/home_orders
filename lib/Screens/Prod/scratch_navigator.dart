@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hellow_world/Screens/Prod/scratch_calendar.dart';
-import 'package:hellow_world/Screens/Prod/scratch_homepage.dart';
+import 'package:hellow_world/Screens/Prod/scratch_today.dart';
 import 'package:hellow_world/Screens/Prod/scratch_vendors.dart';
 
 class ScratchNavigator extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ScratchNavigatorState extends State<ScratchNavigator> {
   Widget build(BuildContext context) {
     return PageView(
       controller: _controller,
-      children: [ScratchCalendar(), ScratchHome(), ScratchVendors()],
+      children: [ScratchCalendar(), ScratchToday(), ScratchVendors()],
     );
   }
 }

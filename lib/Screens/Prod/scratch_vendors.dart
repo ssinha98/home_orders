@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hellow_world/Screens/new_vendor.dart';
 import 'package:hellow_world/Services/vendor_crud.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ScratchVendors extends StatefulWidget {
   @override
@@ -10,10 +11,7 @@ class ScratchVendors extends StatefulWidget {
 class _ScratchVendorsState extends State<ScratchVendors> {
   Stream vendors;
   VendorCRUD vendorCrud = new VendorCRUD();
-  int _creditAmount;
-
-  
-
+  // int _creditAmount;
 
   @override
   void initState() {
@@ -28,10 +26,7 @@ class _ScratchVendorsState extends State<ScratchVendors> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          // title: Text("Vendor Page"),
-          elevation: 0,
-          backgroundColor: Colors.purple),
+      appBar: AppBar(elevation: 0, backgroundColor: Colors.purple),
       body: Stack(children: [
         Container(color: Colors.purple),
         Column(
@@ -43,7 +38,7 @@ class _ScratchVendorsState extends State<ScratchVendors> {
             Container(
               padding: EdgeInsets.all(8),
               child: Text(
-                "Looking at your vendors",
+                "Who you Order From",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 35,
@@ -73,18 +68,15 @@ class _ScratchVendorsState extends State<ScratchVendors> {
     );
   }
 
-    void _showVendorForm() {
-      showModalBottomSheet(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(15.0))),
-          context: context,
-          builder: (context) {
-            return Container(
-                padding: EdgeInsets.all(5), child: AddVendorForm());
-          });
-    }
-
-
+  void _showVendorForm() {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(15.0))),
+        context: context,
+        builder: (context) {
+          return Container(padding: EdgeInsets.all(5), child: AddVendorForm());
+        });
+  }
 
   Widget _vendorList() {
     if (vendors != null) {
@@ -102,7 +94,7 @@ class _ScratchVendorsState extends State<ScratchVendors> {
                           title: Text(
                             snapshot.data.documents[i].data['vendorName'],
                           ),
-                          trailing: snapshot
+                          subtitle: snapshot
                                       .data.documents[i].data['creditAmount'] !=
                                   null
                               ? Text(
@@ -110,6 +102,21 @@ class _ScratchVendorsState extends State<ScratchVendors> {
                                       .toString(),
                                   style: TextStyle(fontSize: 17))
                               : Text("No outstanding credit"),
+                          trailing: IconButton(
+                            icon: Icon(Icons.phone),
+                            onPressed: () async {
+                              var intlNumber = "91" +
+                                  snapshot.data.documents[i].data['phone']
+                                      .toString();
+                              var whatsappUrl = "https://wa.me/$intlNumber";
+                              print(whatsappUrl);
+                              await canLaunch(whatsappUrl)
+                                  ? launch(whatsappUrl)
+                                  : print(
+                                      "open whatsapp app link or do a snackbar with notification that there is no whatsapp installed");
+                              // change to url launch phone sms, whatsapp or phone call
+                            },
+                          ),
                         )));
                   });
             } else {

@@ -59,8 +59,7 @@ class _ScratchToDoState extends State<ScratchToDo> {
           ),
           onPressed: () {
             // add future todo
-        }
-      ),
+          }),
     );
   }
 }

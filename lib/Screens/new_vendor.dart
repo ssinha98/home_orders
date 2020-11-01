@@ -10,6 +10,7 @@ class _AddVendorFormState extends State<AddVendorForm> {
   final _vendormFormKey = GlobalKey<FormState>();
 
   String _newVendorName;
+  int _newVendorContact;
   bool _checked = false;
 
   VendorCRUD vendorCrud = new VendorCRUD();
@@ -46,9 +47,26 @@ class _AddVendorFormState extends State<AddVendorForm> {
                     onChanged: (val) => setState(() => _newVendorName = val),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 25,
                   ),
-                  SizedBox(height: 15),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.phone),
+                      hintText: "What's their phone number?'",
+                      labelText: 'Copy and paste from your contacts!',
+                    ),
+                    keyboardType: TextInputType.phone,
+                    validator: (val) =>
+                        val.isEmpty ? 'Please enter a number' : null,
+                    onChanged: (val) =>
+                        setState(() => _newVendorContact = int.parse(val)),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
                   Center(
                     child: MaterialButton(
                         color: Colors.lightBlue,
@@ -62,7 +80,8 @@ class _AddVendorFormState extends State<AddVendorForm> {
                           print(_newVendorName);
                           // Save to firebase
                           vendorCrud.addData({
-                            'vendorName': this._newVendorName
+                            'vendorName': this._newVendorName,
+                            'phone': this._newVendorContact
                           }).then((result) {
                             print("Saved");
                           }).catchError((e) {
